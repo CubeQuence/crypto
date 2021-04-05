@@ -1,0 +1,39 @@
+{
+    "name": "cubequence/template",
+    "description": "PACKAGE_DESCRIPTION",
+    "keywords": [
+        "PACKAGE_TAG",
+        "cubequence"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luca Castelnuovo",
+            "email": "luca@castelnuovo.xyz"
+        }
+    ],
+    "require": {
+        "php": ">=8.0.0"
+    },
+    "require-dev": {
+        "nunomaduro/phpinsights": "dev-master",
+        "pestphp/pest": "^1.0"
+    },
+    "scripts": {
+        "tests": "./vendor/bin/pest"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "CQ\\Template\\": "src/Template"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/CubeQuence/Template/issues",
+        "source": "https://github.com/CubeQuence/Template"
+    }
+}

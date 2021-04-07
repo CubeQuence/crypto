@@ -1,8 +1,8 @@
 {
-    "name": "cubequence/template",
-    "description": "PACKAGE_DESCRIPTION",
+    "name": "cubequence/crypto",
+    "description": "Cryptography package used in CubeQuence",
     "keywords": [
-        "PACKAGE_TAG",
+        "crypto",
         "cubequence"
     ],
     "license": "MIT",
@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-        "php": ">=8.0.0"
+        "php": ">=8.0.0",
+        "paragonie/halite": "^4.7"
     },
     "require-dev": {
         "nunomaduro/phpinsights": "dev-master",
@@ -27,13 +28,13 @@
     },
     "autoload": {
         "psr-4": {
-            "CQ\\Template\\": "src/Template"
+            "CQ\\Crypto\\": "src/Crypto"
         }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "support": {
-        "issues": "https://github.com/CubeQuence/Template/issues",
-        "source": "https://github.com/CubeQuence/Template"
+        "issues": "https://github.com/CubeQuence/crypto/issues",
+        "source": "https://github.com/CubeQuence/crypto"
     }
 }

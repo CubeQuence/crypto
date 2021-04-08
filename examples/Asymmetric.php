@@ -3,48 +3,51 @@
 declare(strict_types=1);
 
 use CQ\Crypto\Asymmetric;
-use CQ\Crypto\Models\Keypair;
+use CQ\Crypto\Models\AsymmetricKey;
 
 try {
     $string = 'Hello World!';
 
-    $assymetricKeypair = Asymmetric::genKey();
-    $encodedKeypair = $assymetricKeypair->toString();
+    // If no encodedKey is provided a new one is generated
+    $keypair = new AsymmetricKey();
+    $exportKeypair = $keypair->export();
 
-    $newAssymetricKeypair = new Keypair();
-    $newAssymetricKeypair->loadFromString(
-        encodedKeypair: $encodedKeypair
+    // By providing an exported key you can import it
+    $keypair2 = new AsymmetricKey(encodedKey: $exportKeypair);
+    $exportKeypair2 = $keypair2->export();
+
+    $client = new Asymmetric(
+        keypair: $keypair
+    );
+    $client2 = new Asymmetric(
+        keypair: $keypair2
     );
 
-    $assymetricEncryptedString = Asymmetric::encrypt(
+    $encryptedString = $client->encrypt(
+        string: $string
+    );
+    $decryptedString = $client2->decrypt(
+        encryptedString: $encryptedString
+    );
+
+    $signature = $client->sign(
+        string: $string
+    );
+    $verify = $client2->verify(
         string: $string,
-        recieverEncryptionPublicKey: $assymetricKeypair->getEncryption()->getPublicKey()
+        signature: $signature
     );
-    $assymetricDecryptedString = Asymmetric::decrypt(
-        encryptedString: $assymetricEncryptedString,
-        recieverEncryptionPrivateKey: $newAssymetricKeypair->getEncryption()->getSecretKey()
-    );
-    $assymetricSignature = Asymmetric::sign(
-        string: $string,
-        authenticationSecretKey: $assymetricKeypair->getAuthentication()->getSecretKey()
-    );
-    $assymetricVerify = Asymmetric::verify(
-        string: $string,
-        signature: $assymetricSignature,
-        authenticationPublicKey: $newAssymetricKeypair->getAuthentication()->getPublicKey()
-    );
-} catch (\Throwable $th) {
-    echo $th->getMessage();
+} catch (\Throwable $error) {
+    echo $error->getMessage();
     exit;
 }
 
 echo json_encode([
     'string' => $string,
-    'assymetric' => [
-        'keypair' => $encodedKeypair,
-        'encrypted' => $assymetricEncryptedString,
-        'decrypted' => $assymetricDecryptedString,
-        'signature' => $assymetricSignature,
-        'verify' => $assymetricVerify,
-    ],
+    'export' => $exportKey,
+    'export2' => $exportKey2,
+    'encrypted' => $encryptedString,
+    'decrypted' => $decryptedString,
+    'signature' => $signature,
+    'verify' => $verify,
 ]);

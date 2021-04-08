@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-class Random
+final class Random
 {
     /**
      * Generate a more truly "random" alpha-numeric string.

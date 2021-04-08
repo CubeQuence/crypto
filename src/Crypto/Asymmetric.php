@@ -4,107 +4,61 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
+use CQ\Crypto\Models\AsymmetricKey;
+use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Halite\Asymmetric\Crypto;
-use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
-use ParagonIE\Halite\Asymmetric\EncryptionSecretKey;
-use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
-use ParagonIE\Halite\Asymmetric\SignatureSecretKey;
-use ParagonIE\Halite\KeyFactory;
 use ParagonIE\HiddenString\HiddenString;
-use CQ\Crypto\Models\Keypair;
 
-class Asymmetric
+final class Asymmetric extends CryptoProvider
 {
     public function __construct(
-        private Keypair $keypair
+        private AsymmetricKey $keypair
     ) {
-    }
-
-    /**
-     * Generate encryption keypair
-     */
-    public static function genKey(): Keypair
-    {
-        $keypair = new Keypair();
-
-        $keypair->setAuthentication(
-            authentication: KeyFactory::generateSignatureKeyPair()
-        );
-        $keypair->setEncryption(
-            encryption: KeyFactory::generateEncryptionKeyPair()
-        );
-
-        return $keypair;
     }
 
     /**
      * Encrypt string
      */
-    public static function encrypt(
-        string $string,
-        EncryptionPublicKey $recieverEncryptionPublicKey,
-        ?EncryptionSecretKey $senderEncryptionSecretKey = null
-    ): string {
-        if ($senderEncryptionSecretKey) {
-            return Crypto::encrypt(
-                plaintext: new HiddenString($string),
-                ourPrivateKey: $senderEncryptionSecretKey,
-                theirPublicKey: $recieverEncryptionPublicKey
-            );
-        }
-
+    public function encrypt(string $string): string
+    {
         return Crypto::seal(
             plaintext: new HiddenString(value: $string),
-            publicKey: $recieverEncryptionPublicKey
+            publicKey: $this->keypair->getEncryption()->getPublicKey()
         );
     }
 
     /**
-     * Decrypt string
+     * Decrypt encryptedString
      */
-    public static function decrypt(
-        string $encryptedString,
-        EncryptionSecretKey $recieverEncryptionPrivateKey,
-        ?EncryptionPublicKey $senderEncryptionPublicKey = null
-    ): string {
-        if ($senderEncryptionPublicKey) {
-            return Crypto::decrypt(
-                ciphertext: $encryptedString,
-                ourPrivateKey: $recieverEncryptionPrivateKey,
-                theirPublicKey: $senderEncryptionPublicKey
-            )->getString();
-        }
-
+    public function decrypt(string $encryptedString): string
+    {
         return Crypto::unseal(
             ciphertext: $encryptedString,
-            privateKey: $recieverEncryptionPrivateKey
+            privateKey: $this->keypair->getEncryption()->getSecretKey()
         )->getString();
     }
 
     /**
      * Sign string
      */
-    public static function sign(
-        string $string,
-        SignatureSecretKey $authenticationSecretKey
-    ): string {
+    public function sign(string $string): string
+    {
         return Crypto::sign(
             message: $string,
-            privateKey: $authenticationSecretKey
+            privateKey: $this->keypair->getAuthentication()->getSecretKey()
         );
     }
 
     /**
-     * Verify string
+     * Verify string with signature
      */
-    public static function verify(
+    public function verify(
         string $string,
-        string $signature,
-        SignaturePublicKey $authenticationPublicKey
+        string $signature
     ): bool {
         return Crypto::verify(
             message: $string,
-            publicKey: $authenticationPublicKey,
+            publicKey: $this->keypair->getAuthentication()->getPublicKey(),
             signature: $signature
         );
     }

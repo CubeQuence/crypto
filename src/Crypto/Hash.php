@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-class Hash
+final class Hash
 {
     private static int $hash_cost = 2;
 

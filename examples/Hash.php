@@ -14,8 +14,8 @@ try {
         string: $string,
         hash: $hash
     );
-} catch (\Throwable $th) {
-    echo $th->getMessage();
+} catch (\Throwable $error) {
+    echo $error->getMessage();
     exit;
 }
 

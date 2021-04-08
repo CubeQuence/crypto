@@ -8,8 +8,8 @@ try {
     $random = Random::string(
         length: 32
     );
-} catch (\Throwable $th) {
-    echo $th->getMessage();
+} catch (\Throwable $error) {
+    echo $error->getMessage();
     exit;
 }
 

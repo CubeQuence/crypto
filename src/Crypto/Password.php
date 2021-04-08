@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-class Password
+use CQ\Crypto\Models\SymmetricKey;
+
+final class Password
 {
     private Symmetric $symmetric;
 
     public function __construct(
-        string $keystring
+        SymmetricKey $key
     ) {
-        $this->symmetric = new Symmetric(
-            keystring: $keystring
-        );
+        $this->symmetric = new Symmetric(key: $key);
     }
 
     /**
@@ -35,7 +35,7 @@ class Password
     }
 
     /**
-     * Verify password
+     * Verify password with encryptedHashedPassword
      */
     public function verify(
         string $plaintextPassword,
@@ -49,7 +49,7 @@ class Password
         );
 
         return Hash::verify(
-            check_against: $plaintextPasswordWithContext,
+            string: $plaintextPasswordWithContext,
             hash: $hashedPassword
         );
     }

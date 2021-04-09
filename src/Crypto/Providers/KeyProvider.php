@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Providers;
 
+use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
+use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
 use ParagonIE\Halite\Symmetric\AuthenticationKey;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\SignatureKeyPair;
@@ -23,22 +25,21 @@ abstract class KeyProvider
     }
 
     /**
-     * Turn key into string
-     * to store in DB or file
-     */
-    abstract public function export(): string;
-
-    abstract public function getAuthentication(): AuthenticationKey | SignatureKeyPair;
-
-    abstract public function getEncryption(): EncryptionKey | EncryptionKeyPair;
-
-    /**
-     * Generate encryption key
+     * Generate key
      */
     abstract protected function genKey(): void;
 
     /**
-     * Import key from string
+     * Import key
      */
     abstract protected function import(string $encodedKey): void;
+
+    /**
+     * Export (private) key
+     */
+    abstract public function export(): string;
+
+    abstract public function getAuthentication(): AuthenticationKey | SignatureKeyPair | SignaturePublicKey;
+
+    abstract public function getEncryption(): EncryptionKey | EncryptionKeyPair | EncryptionPublicKey;
 }

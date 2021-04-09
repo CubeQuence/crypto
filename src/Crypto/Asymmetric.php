@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
+use CQ\Crypto\Exceptions\AssymetricKeyException;
 use CQ\Crypto\Models\AsymmetricKey;
 use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Halite\Asymmetric\Crypto;
+use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
 use ParagonIE\HiddenString\HiddenString;
 
 final class Asymmetric extends CryptoProvider
@@ -21,9 +23,13 @@ final class Asymmetric extends CryptoProvider
      */
     public function encrypt(string $string): string
     {
+        $publicKey = $this->keypair->getPublicOnly() ?
+            $this->keypair->getEncryption()
+            : $this->keypair->getEncryption()->getPublicKey();
+
         return Crypto::seal(
             plaintext: new HiddenString(value: $string),
-            publicKey: $this->keypair->getEncryption()->getPublicKey()
+            publicKey: $publicKey
         );
     }
 
@@ -32,6 +38,12 @@ final class Asymmetric extends CryptoProvider
      */
     public function decrypt(string $encryptedString): string
     {
+        if ($this->keypair->getEncryption() instanceof EncryptionPublicKey) {
+            throw new AssymetricKeyException(
+                message: "Can't decrypt with publicOnly AssymetricKey instance"
+            );
+        }
+
         return Crypto::unseal(
             ciphertext: $encryptedString,
             privateKey: $this->keypair->getEncryption()->getSecretKey()
@@ -43,6 +55,12 @@ final class Asymmetric extends CryptoProvider
      */
     public function sign(string $string): string
     {
+        if ($this->keypair->getAuthentication() instanceof EncryptionPublicKey) {
+            throw new AssymetricKeyException(
+                message: "Can't sign with publicOnly AssymetricKey instance"
+            );
+        }
+
         return Crypto::sign(
             message: $string,
             privateKey: $this->keypair->getAuthentication()->getSecretKey()
@@ -56,9 +74,13 @@ final class Asymmetric extends CryptoProvider
         string $string,
         string $signature
     ): bool {
+        $publicKey = $this->keypair->getPublicOnly() ?
+            $this->keypair->getAuthentication()
+            : $this->keypair->getAuthentication()->getPublicKey();
+
         return Crypto::verify(
             message: $string,
-            publicKey: $this->keypair->getAuthentication()->getPublicKey(),
+            publicKey: $publicKey,
             signature: $signature
         );
     }

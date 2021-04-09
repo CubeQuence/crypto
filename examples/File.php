@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use CQ\Crypto\File;
-use CQ\Crypto\Models\SymmetricKey;
 use CQ\Crypto\Models\AsymmetricKey;
+use CQ\Crypto\Models\SymmetricKey;
 
 try {
     // To try this please create a file named test.txt

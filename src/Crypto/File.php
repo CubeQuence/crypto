@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-use ParagonIE\Halite\File as HaliteFile;
-use CQ\Crypto\Models\SymmetricKey;
 use CQ\Crypto\Models\AsymmetricKey;
+use CQ\Crypto\Models\SymmetricKey;
+use ParagonIE\Halite\File as HaliteFile;
 
 final class File
 {
     public function __construct(
         private string $rootPath
     ) {
-        if (!str_ends_with(
+        if (! str_ends_with(
             haystack: $this->rootPath,
             needle: '/'
         )) {
-            $this->rootPath = $this->rootPath . '/';
+            $this->rootPath .= '/';
         }
     }
 

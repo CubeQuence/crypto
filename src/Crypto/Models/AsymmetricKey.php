@@ -44,21 +44,29 @@ final class AsymmetricKey extends KeyProvider
 
         $this->authentication = new Keypair(
             publicKey: KeyFactory::importSignaturePublicKey(
-                keyData: new HiddenString(value: $decodedKey->authentication->publicKey)
+                keyData: new HiddenString(
+                    value: $decodedKey->authentication->publicKey
+                )
             ),
             secretKey: $decodedKey->authentication->secretKey ?
                 KeyFactory::importSignatureSecretKey(
-                    keyData: new HiddenString(value: $decodedKey->authentication->secretKey)
+                    keyData: new HiddenString(
+                        value: $decodedKey->authentication->secretKey
+                    )
                 ) : null // If secretKey isset import it otherwise set null
         );
 
         $this->encryption = new Keypair(
             publicKey: KeyFactory::importEncryptionPublicKey(
-                keyData: new HiddenString(value: $decodedKey->encryption->publicKey)
+                keyData: new HiddenString(
+                    value: $decodedKey->encryption->publicKey
+                )
             ),
             secretKey: $decodedKey->encryption->secretKey ?
                 KeyFactory::importEncryptionSecretKey(
-                    keyData: new HiddenString(value: $decodedKey->encryption->secretKey)
+                    keyData: new HiddenString(
+                        value: $decodedKey->encryption->secretKey
+                    )
                 ) : null // If secretKey isset import it otherwise set null
         );
     }
@@ -87,7 +95,7 @@ final class AsymmetricKey extends KeyProvider
     /**
      * Export public key
      */
-    public function exportPublic() : string
+    public function exportPublic(): string
     {
         $keypair = [
             'authentication' => [

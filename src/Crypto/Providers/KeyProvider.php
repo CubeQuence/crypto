@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Providers;
 
+use CQ\Crypto\Helpers\Keypair;
 use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
 use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
 use ParagonIE\Halite\Symmetric\AuthenticationKey;
@@ -39,7 +40,7 @@ abstract class KeyProvider
      */
     abstract public function export(): string;
 
-    abstract public function getAuthentication(): AuthenticationKey | SignatureKeyPair | SignaturePublicKey;
+    abstract public function getAuthentication(): AuthenticationKey | Keypair;
 
-    abstract public function getEncryption(): EncryptionKey | EncryptionKeyPair | EncryptionPublicKey;
+    abstract public function getEncryption(): EncryptionKey | Keypair;
 }

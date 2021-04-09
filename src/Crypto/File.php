@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-use CQ\Crypto\Exceptions\AssymetricKeyException;
-use ParagonIE\Halite\File as FileCrypto;
+use ParagonIE\Halite\File as HaliteFile;
 use CQ\Crypto\Models\SymmetricKey;
 use CQ\Crypto\Models\AsymmetricKey;
 
@@ -31,16 +30,14 @@ final class File
         AsymmetricKey | SymmetricKey | null $key = null
     ): string {
         if ($key instanceof AsymmetricKey) {
-            $key = $key->getPublicOnly() ?
-                $key->getAuthentication()
-                : $key->getAuthentication()->getPublicKey();
+            $key = $key->getAuthentication()->getPublicKey();
         }
 
         if ($key instanceof SymmetricKey) {
             $key = $key->getAuthentication();
         }
 
-        return FileCrypto::checksum(
+        return HaliteFile::checksum(
             filePath: $this->rootPath . $path,
             key: $key
         );
@@ -55,11 +52,9 @@ final class File
         AsymmetricKey | SymmetricKey $key
     ): int {
         if ($key instanceof AsymmetricKey) {
-            $key = $key->getPublicOnly() ?
-                $key->getEncryption()
-                : $key->getEncryption()->getPublicKey();
+            $key = $key->getEncryption()->getPublicKey();
 
-            return FileCrypto::seal(
+            return HaliteFile::seal(
                 input: $sourcePath,
                 output: $destinationPath,
                 publicKey: $key
@@ -68,7 +63,7 @@ final class File
 
         $key = $key->getEncryption();
 
-        return FileCrypto::encrypt(
+        return HaliteFile::encrypt(
             input: $sourcePath,
             output: $destinationPath,
             key: $key
@@ -84,15 +79,9 @@ final class File
         AsymmetricKey | SymmetricKey $key
     ): bool {
         if ($key instanceof AsymmetricKey) {
-            if ($key->getPublicOnly()) {
-                throw new AssymetricKeyException(
-                    message: "Can't decrypt with publicOnly AssymetricKey instance"
-                );
-            }
-
             $key = $key->getEncryption()->getSecretKey();
 
-            return FileCrypto::unseal(
+            return HaliteFile::unseal(
                 input: $sourcePath,
                 output: $destinationPath,
                 secretKey: $key
@@ -101,7 +90,7 @@ final class File
 
         $key = $key->getEncryption();
 
-        return FileCrypto::decrypt(
+        return HaliteFile::decrypt(
             input: $sourcePath,
             output: $destinationPath,
             key: $key
@@ -115,15 +104,9 @@ final class File
         string $path,
         AsymmetricKey $key
     ): string {
-        if ($key->getPublicOnly()) {
-            throw new AssymetricKeyException(
-                message: "Can't sign with publicOnly AssymetricKey instance"
-            );
-        }
-
         $key = $key->getAuthentication()->getSecretKey();
 
-        return FileCrypto::sign(
+        return HaliteFile::sign(
             filename: $path,
             secretKey: $key
         );
@@ -137,13 +120,9 @@ final class File
         string $signature,
         AsymmetricKey $key
     ): bool {
-        $key = $key->getPublicOnly() ?
-            $key->getAuthentication()
-            : $key->getAuthentication()->getPublicKey();
-
-        return FileCrypto::verify(
+        return HaliteFile::verify(
             filename: $path,
-            publicKey: $key,
+            publicKey: $key->getAuthentication()->getPublicKey(),
             signature: $signature
         );
     }

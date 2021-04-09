@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-use CQ\Crypto\Exceptions\AssymetricKeyException;
 use CQ\Crypto\Models\AsymmetricKey;
 use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Halite\Asymmetric\Crypto;
@@ -13,7 +12,7 @@ use ParagonIE\HiddenString\HiddenString;
 final class Asymmetric extends CryptoProvider
 {
     public function __construct(
-        private AsymmetricKey $keypair
+        private AsymmetricKey $key
     ) {
     }
 
@@ -22,13 +21,9 @@ final class Asymmetric extends CryptoProvider
      */
     public function encrypt(string $string): string
     {
-        $publicKey = $this->keypair->getPublicOnly() ?
-            $this->keypair->getEncryption()
-            : $this->keypair->getEncryption()->getPublicKey();
-
         return Crypto::seal(
             plaintext: new HiddenString(value: $string),
-            publicKey: $publicKey
+            publicKey: $this->key->getEncryption()->getPublicKey()
         );
     }
 
@@ -37,15 +32,9 @@ final class Asymmetric extends CryptoProvider
      */
     public function decrypt(string $encryptedString): string
     {
-        if ($this->keypair->getPublicOnly()) {
-            throw new AssymetricKeyException(
-                message: "Can't decrypt with publicOnly AssymetricKey instance"
-            );
-        }
-
         return Crypto::unseal(
             ciphertext: $encryptedString,
-            privateKey: $this->keypair->getEncryption()->getSecretKey()
+            privateKey: $this->key->getEncryption()->getSecretKey()
         )->getString();
     }
 
@@ -54,15 +43,9 @@ final class Asymmetric extends CryptoProvider
      */
     public function sign(string $string): string
     {
-        if ($this->keypair->getPublicOnly()) {
-            throw new AssymetricKeyException(
-                message: "Can't sign with publicOnly AssymetricKey instance"
-            );
-        }
-
         return Crypto::sign(
             message: $string,
-            privateKey: $this->keypair->getAuthentication()->getSecretKey()
+            privateKey: $this->key->getAuthentication()->getSecretKey()
         );
     }
 
@@ -73,13 +56,9 @@ final class Asymmetric extends CryptoProvider
         string $string,
         string $signature
     ): bool {
-        $publicKey = $this->keypair->getPublicOnly() ?
-            $this->keypair->getAuthentication()
-            : $this->keypair->getAuthentication()->getPublicKey();
-
         return Crypto::verify(
             message: $string,
-            publicKey: $publicKey,
+            publicKey: $this->key->getAuthentication()->getPublicKey(),
             signature: $signature
         );
     }

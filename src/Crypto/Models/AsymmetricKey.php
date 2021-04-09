@@ -4,28 +4,33 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Models;
 
-use CQ\Crypto\Exceptions\AssymetricKeyException;
+use CQ\Crypto\Helpers\Keypair;
 use CQ\Crypto\Providers\KeyProvider;
-use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
-use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
-use ParagonIE\Halite\EncryptionKeyPair;
 use ParagonIE\Halite\KeyFactory;
-use ParagonIE\Halite\SignatureKeyPair;
 use ParagonIE\HiddenString\HiddenString;
 
 final class AsymmetricKey extends KeyProvider
 {
-    private SignatureKeyPair|SignaturePublicKey $authentication;
-    private EncryptionKeyPair|EncryptionPublicKey $encryption;
-    private bool $publicOnly = false;
+    private Keypair $authentication;
+    private Keypair $encryption;
 
     /**
      * Generate encryption keypair
      */
     protected function genKey(): void
     {
-        $this->authentication = KeyFactory::generateSignatureKeyPair();
-        $this->encryption = KeyFactory::generateEncryptionKeyPair();
+        $authenticationKeypair = KeyFactory::generateSignatureKeyPair();
+        $encryptionKeypair = KeyFactory::generateEncryptionKeypair();
+
+        $this->authentication = new Keypair(
+            publicKey: $authenticationKeypair->getPublicKey(),
+            secretKey: $authenticationKeypair->getSecretKey()
+        );
+
+        $this->encryption = new Keypair(
+            publicKey: $encryptionKeypair->getPublicKey(),
+            secretKey: $encryptionKeypair->getSecretKey()
+        );
     }
 
     /**
@@ -37,31 +42,25 @@ final class AsymmetricKey extends KeyProvider
             base64_decode($encodedKey)
         );
 
-        $authenticationHiddenString = new HiddenString($decodedKey->authentication);
-        $encryptionHiddenString = new HiddenString($decodedKey->encryption);
-
-
-        if (!$decodedKey->public) {
-            $this->authentication = KeyFactory::importSignatureKeyPair(
-                keyData: $authenticationHiddenString
-            );
-
-            $this->encryption = KeyFactory::importEncryptionKeyPair(
-                keyData: $encryptionHiddenString
-            );
-
-            return;
-        }
-
-        $this->authentication = KeyFactory::importSignaturePublicKey(
-            keyData: $authenticationHiddenString
+        $this->authentication = new Keypair(
+            publicKey: KeyFactory::importSignaturePublicKey(
+                keyData: new HiddenString(value: $decodedKey->authentication->publicKey)
+            ),
+            secretKey: $decodedKey->authentication->secretKey ?
+                KeyFactory::importSignatureSecretKey(
+                    keyData: new HiddenString(value: $decodedKey->authentication->secretKey)
+                ) : null // If secretKey isset import it otherwise set null
         );
 
-        $this->encryption = KeyFactory::importEncryptionPublicKey(
-            keyData: $encryptionHiddenString
+        $this->encryption = new Keypair(
+            publicKey: KeyFactory::importEncryptionPublicKey(
+                keyData: new HiddenString(value: $decodedKey->encryption->publicKey)
+            ),
+            secretKey: $decodedKey->encryption->secretKey ?
+                KeyFactory::importEncryptionSecretKey(
+                    keyData: new HiddenString(value: $decodedKey->encryption->secretKey)
+                ) : null // If secretKey isset import it otherwise set null
         );
-
-        $this->publicOnly = true;
     }
 
     /**
@@ -69,20 +68,15 @@ final class AsymmetricKey extends KeyProvider
      */
     public function export(): string
     {
-        if ($this->publicOnly) {
-            throw new AssymetricKeyException(
-                message: "Can't export private keys of publicOnly AssymetricKey instance"
-            );
-        }
-
         $keypair = [
-            'authentication' => KeyFactory::export(
-                key:  $this->authentication
-            )->getString(),
-            'encryption' => KeyFactory::export(
-                key:  $this->encryption
-            )->getString(),
-            'public' => false,
+            'authentication' => [
+                'publicKey' => $this->authentication->exportPublicKey(),
+                'secretKey' => $this->authentication->exportSecretKey(),
+            ],
+            'encryption' => [
+                'publicKey' => $this->encryption->exportPublicKey(),
+                'secretKey' => $this->encryption->exportSecretKey(),
+            ],
         ];
 
         return base64_encode(
@@ -96,13 +90,14 @@ final class AsymmetricKey extends KeyProvider
     public function exportPublic() : string
     {
         $keypair = [
-            'authentication' => KeyFactory::export(
-                key:  $this->authentication->getPublicKey()
-            )->getString(),
-            'encryption' => KeyFactory::export(
-                key:  $this->encryption->getPublicKey()
-            )->getString(),
-            'public' => true,
+            'authentication' => [
+                'publicKey' => $this->authentication->exportPublicKey(),
+                'secretKey' => null,
+            ],
+            'encryption' => [
+                'publicKey' => $this->encryption->exportPublicKey(),
+                'secretKey' => null,
+            ],
         ];
 
         return base64_encode(
@@ -110,17 +105,12 @@ final class AsymmetricKey extends KeyProvider
         );
     }
 
-    public function getPublicOnly() : bool
-    {
-        return $this->publicOnly;
-    }
-
-    public function getAuthentication(): SignatureKeyPair | SignaturePublicKey
+    public function getAuthentication(): Keypair
     {
         return $this->authentication;
     }
 
-    public function getEncryption(): EncryptionKeyPair | EncryptionPublicKey
+    public function getEncryption(): Keypair
     {
         return $this->encryption;
     }

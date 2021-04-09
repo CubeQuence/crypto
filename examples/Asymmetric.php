@@ -9,25 +9,25 @@ try {
     $string = 'Hello World!';
 
     // If no encodedKey is provided a new one is generated
-    $keypair = new AsymmetricKey();
+    $keyInstance = new AsymmetricKey();
 
     /**
      * There are two different ways to export AssymetricKey's
      *
-     * The first is using the export() method, this returns the private encodedKey
+     * The first is using the export() method, this returns the full key
      * If you import this key you can execute all functions
      *
-     * The second is using the exportPublic() method, this returns the public encodedKey
+     * The second is using the exportPublic() method, this only returns the public key
      * If you import this key you can't execute decrypt() or sign()
      */
-    $exportKeypair = $keypair->export();
-    $exportPublicKeypair = $keypair->exportPublic();
+    $exportFullKey = $keyInstance->export();
+    $exportPublicKey = $keyInstance->exportPublic();
 
     // By providing an encodedKey you can import and use it
-    $keypair2 = new AsymmetricKey(encodedKey: $exportPublicKeypair);
+    $keyInstance2 = new AsymmetricKey(encodedKey: $exportPublicKey);
 
-    $client = new Asymmetric(keypair: $keypair);
-    $client2 = new Asymmetric(keypair: $keypair2);
+    $client = new Asymmetric(key: $keyInstance);
+    $client2 = new Asymmetric(key: $keyInstance2);
 
     $encryptedString = $client2->encrypt( // Encrypt using public key
         string: $string
@@ -50,9 +50,9 @@ try {
 
 echo json_encode([
     'string' => $string,
-    'export' => $exportKeypair,
-    'exportPublic' => $exportPublicKeypair,
-    'encrypted' => $encryptedString,
+    'exportFullKey' => $exportFullKey,
+    'exportPublicKey' => $exportPublicKey,
+    'encryptedString' => $encryptedString,
     'decrypted' => $decryptedString,
     'signature' => $signature,
     'verify' => $verify,

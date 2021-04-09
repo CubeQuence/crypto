@@ -6,6 +6,6 @@ namespace CQ\Crypto\Exceptions;
 
 use Exception;
 
-final class AssymetricKeyException extends Exception
+final class KeyException extends Exception
 {
 }

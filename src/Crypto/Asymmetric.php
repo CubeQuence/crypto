@@ -8,7 +8,6 @@ use CQ\Crypto\Exceptions\AssymetricKeyException;
 use CQ\Crypto\Models\AsymmetricKey;
 use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Halite\Asymmetric\Crypto;
-use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
 use ParagonIE\HiddenString\HiddenString;
 
 final class Asymmetric extends CryptoProvider
@@ -38,7 +37,7 @@ final class Asymmetric extends CryptoProvider
      */
     public function decrypt(string $encryptedString): string
     {
-        if ($this->keypair->getEncryption() instanceof EncryptionPublicKey) {
+        if ($this->keypair->getPublicOnly()) {
             throw new AssymetricKeyException(
                 message: "Can't decrypt with publicOnly AssymetricKey instance"
             );
@@ -55,7 +54,7 @@ final class Asymmetric extends CryptoProvider
      */
     public function sign(string $string): string
     {
-        if ($this->keypair->getAuthentication() instanceof EncryptionPublicKey) {
+        if ($this->keypair->getPublicOnly()) {
             throw new AssymetricKeyException(
                 message: "Can't sign with publicOnly AssymetricKey instance"
             );

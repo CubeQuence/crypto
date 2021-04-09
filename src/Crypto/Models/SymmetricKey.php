@@ -15,7 +15,7 @@ final class SymmetricKey extends KeyProvider
     private string $keystring;
 
     /**
-     * Generate encryption key
+     * Generate key
      */
     protected function genKey(): void
     {
@@ -25,7 +25,7 @@ final class SymmetricKey extends KeyProvider
     }
 
     /**
-     * Import key from string
+     * Import key
      */
     protected function import(string $encodedKey): void
     {
@@ -33,8 +33,7 @@ final class SymmetricKey extends KeyProvider
     }
 
     /**
-     * Turn key into string
-     * to store in DB or file
+     * Export key
      */
     public function export(): string
     {

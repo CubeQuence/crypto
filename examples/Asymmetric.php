@@ -9,31 +9,37 @@ try {
     $string = 'Hello World!';
 
     // If no encodedKey is provided a new one is generated
-    $keypair = new AsymmetricKey();
-    $exportKeypair = $keypair->export();
+    $keyInstance = new AsymmetricKey();
 
-    // By providing an exported key you can import it
-    $keypair2 = new AsymmetricKey(encodedKey: $exportKeypair);
-    $exportKeypair2 = $keypair2->export();
+    /**
+     * There are two different ways to export AssymetricKey's
+     *
+     * The first is using the export() method, this returns the full key
+     * If you import this key you can execute all functions
+     *
+     * The second is using the exportPublic() method, this only returns the public key
+     * If you import this key you can't execute decrypt() or sign()
+     */
+    $exportFullKey = $keyInstance->export();
+    $exportPublicKey = $keyInstance->exportPublic();
 
-    $client = new Asymmetric(
-        keypair: $keypair
-    );
-    $client2 = new Asymmetric(
-        keypair: $keypair2
-    );
+    // By providing an encodedKey you can import and use it
+    $keyInstance2 = new AsymmetricKey(encodedKey: $exportPublicKey);
 
-    $encryptedString = $client->encrypt(
+    $client = new Asymmetric(key: $keyInstance);
+    $client2 = new Asymmetric(key: $keyInstance2);
+
+    $encryptedString = $client2->encrypt( // Encrypt using public key
         string: $string
     );
-    $decryptedString = $client2->decrypt(
+    $decryptedString = $client->decrypt(
         encryptedString: $encryptedString
     );
 
     $signature = $client->sign(
         string: $string
     );
-    $verify = $client2->verify(
+    $verify = $client2->verify( // Verify using public key
         string: $string,
         signature: $signature
     );
@@ -44,9 +50,9 @@ try {
 
 echo json_encode([
     'string' => $string,
-    'export' => $exportKey,
-    'export2' => $exportKey2,
-    'encrypted' => $encryptedString,
+    'exportFullKey' => $exportFullKey,
+    'exportPublicKey' => $exportPublicKey,
+    'encryptedString' => $encryptedString,
     'decrypted' => $decryptedString,
     'signature' => $signature,
     'verify' => $verify,

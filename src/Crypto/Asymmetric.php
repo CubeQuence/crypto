@@ -12,7 +12,7 @@ use ParagonIE\HiddenString\HiddenString;
 final class Asymmetric extends CryptoProvider
 {
     public function __construct(
-        private AsymmetricKey $keypair
+        private AsymmetricKey $key
     ) {
     }
 
@@ -23,7 +23,7 @@ final class Asymmetric extends CryptoProvider
     {
         return Crypto::seal(
             plaintext: new HiddenString(value: $string),
-            publicKey: $this->keypair->getEncryption()->getPublicKey()
+            publicKey: $this->key->getEncryption()->getPublicKey()
         );
     }
 
@@ -34,7 +34,7 @@ final class Asymmetric extends CryptoProvider
     {
         return Crypto::unseal(
             ciphertext: $encryptedString,
-            privateKey: $this->keypair->getEncryption()->getSecretKey()
+            privateKey: $this->key->getEncryption()->getSecretKey()
         )->getString();
     }
 
@@ -45,7 +45,7 @@ final class Asymmetric extends CryptoProvider
     {
         return Crypto::sign(
             message: $string,
-            privateKey: $this->keypair->getAuthentication()->getSecretKey()
+            privateKey: $this->key->getAuthentication()->getSecretKey()
         );
     }
 
@@ -58,7 +58,7 @@ final class Asymmetric extends CryptoProvider
     ): bool {
         return Crypto::verify(
             message: $string,
-            publicKey: $this->keypair->getAuthentication()->getPublicKey(),
+            publicKey: $this->key->getAuthentication()->getPublicKey(),
             signature: $signature
         );
     }

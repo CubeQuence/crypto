@@ -19,14 +19,10 @@ final class Password
     /**
      * Hash and encrypt password
      */
-    public function hash(
-        string $plaintextPassword,
-        ?string $context = null
-    ): string {
-        $plaintextPasswordWithContext = $plaintextPassword . $context;
-
+    public function hash(string $plaintextPassword): string
+    {
         $hashedPassword = Hash::make(
-            string: $plaintextPasswordWithContext
+            string: $plaintextPassword
         );
 
         return $this->symmetric->encrypt(
@@ -39,17 +35,14 @@ final class Password
      */
     public function verify(
         string $plaintextPassword,
-        string $encryptedHashedPassword,
-        ?string $context = null,
+        string $encryptedHashedPassword
     ): bool {
-        $plaintextPasswordWithContext = $plaintextPassword . $context;
-
         $hashedPassword = $this->symmetric->decrypt(
             encryptedString: $encryptedHashedPassword
         );
 
         return Hash::verify(
-            string: $plaintextPasswordWithContext,
+            string: $plaintextPassword,
             hash: $hashedPassword
         );
     }

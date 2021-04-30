@@ -14,7 +14,8 @@
     ],
     "require": {
         "php": ">=8.0.0",
-        "paragonie/halite": "^4.7"
+        "paragonie/halite": "^4.7",
+        "paragonie/paseto": "^1.1"
     },
     "require-dev": {
         "nunomaduro/phpinsights": "dev-master",

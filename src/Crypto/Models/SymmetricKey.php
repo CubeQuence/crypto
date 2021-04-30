@@ -15,24 +15,6 @@ final class SymmetricKey extends KeyProvider
     private string $keystring;
 
     /**
-     * Generate key
-     */
-    protected function genKey(): void
-    {
-        $key = KeyFactory::generateEncryptionKey();
-
-        $this->keystring = KeyFactory::export(key: $key)->getString();
-    }
-
-    /**
-     * Import key
-     */
-    protected function import(string $encodedKey): void
-    {
-        $this->keystring = base64_decode($encodedKey);
-    }
-
-    /**
      * Export key
      */
     public function export(): string
@@ -52,5 +34,23 @@ final class SymmetricKey extends KeyProvider
         return KeyFactory::importEncryptionKey(
             keyData: new HiddenString(value: $this->keystring)
         );
+    }
+
+    /**
+     * Generate key
+     */
+    protected function genKey(): void
+    {
+        $key = KeyFactory::generateEncryptionKey();
+
+        $this->keystring = KeyFactory::export(key: $key)->getString();
+    }
+
+    /**
+     * Import key
+     */
+    protected function import(string $encodedKey): void
+    {
+        $this->keystring = base64_decode($encodedKey);
     }
 }

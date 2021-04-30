@@ -5,18 +5,14 @@ declare(strict_types=1);
 namespace CQ\Crypto\Providers;
 
 use CQ\Crypto\Helpers\Keypair;
-use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
-use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
 use ParagonIE\Halite\Symmetric\AuthenticationKey;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
-use ParagonIE\Halite\SignatureKeyPair;
-use ParagonIE\Halite\EncryptionKeyPair;
 
 abstract class KeyProvider
 {
     public function __construct(string | null $encodedKey = null)
     {
-        if (! $encodedKey) {
+        if (!$encodedKey) {
             return $this->genKey();
         }
 
@@ -24,6 +20,15 @@ abstract class KeyProvider
             encodedKey: $encodedKey
         );
     }
+
+    /**
+     * Export (private) key
+     */
+    abstract public function export(): string;
+
+    abstract public function getAuthentication(): AuthenticationKey | Keypair;
+
+    abstract public function getEncryption(): EncryptionKey | Keypair;
 
     /**
      * Generate key
@@ -34,13 +39,4 @@ abstract class KeyProvider
      * Import key
      */
     abstract protected function import(string $encodedKey): void;
-
-    /**
-     * Export (private) key
-     */
-    abstract public function export(): string;
-
-    abstract public function getAuthentication(): AuthenticationKey | Keypair;
-
-    abstract public function getEncryption(): EncryptionKey | Keypair;
 }

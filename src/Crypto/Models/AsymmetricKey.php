@@ -15,6 +15,58 @@ final class AsymmetricKey extends KeyProvider
     private Keypair $encryption;
 
     /**
+     * Export private key
+     */
+    public function export(): string
+    {
+        $keypair = [
+            'authentication' => [
+                'publicKey' => $this->authentication->exportPublicKey(),
+                'secretKey' => $this->authentication->exportSecretKey(),
+            ],
+            'encryption' => [
+                'publicKey' => $this->encryption->exportPublicKey(),
+                'secretKey' => $this->encryption->exportSecretKey(),
+            ],
+        ];
+
+        return base64_encode(
+            json_encode($keypair)
+        );
+    }
+
+    /**
+     * Export public key
+     */
+    public function exportPublic(): string
+    {
+        $keypair = [
+            'authentication' => [
+                'publicKey' => $this->authentication->exportPublicKey(),
+                'secretKey' => null,
+            ],
+            'encryption' => [
+                'publicKey' => $this->encryption->exportPublicKey(),
+                'secretKey' => null,
+            ],
+        ];
+
+        return base64_encode(
+            json_encode($keypair)
+        );
+    }
+
+    public function getAuthentication(): Keypair
+    {
+        return $this->authentication;
+    }
+
+    public function getEncryption(): Keypair
+    {
+        return $this->encryption;
+    }
+
+    /**
      * Generate encryption keypair
      */
     protected function genKey(): void
@@ -69,57 +121,5 @@ final class AsymmetricKey extends KeyProvider
                     )
                 ) : null // If secretKey isset import it otherwise set null
         );
-    }
-
-    /**
-     * Export private key
-     */
-    public function export(): string
-    {
-        $keypair = [
-            'authentication' => [
-                'publicKey' => $this->authentication->exportPublicKey(),
-                'secretKey' => $this->authentication->exportSecretKey(),
-            ],
-            'encryption' => [
-                'publicKey' => $this->encryption->exportPublicKey(),
-                'secretKey' => $this->encryption->exportSecretKey(),
-            ],
-        ];
-
-        return base64_encode(
-            json_encode($keypair)
-        );
-    }
-
-    /**
-     * Export public key
-     */
-    public function exportPublic(): string
-    {
-        $keypair = [
-            'authentication' => [
-                'publicKey' => $this->authentication->exportPublicKey(),
-                'secretKey' => null,
-            ],
-            'encryption' => [
-                'publicKey' => $this->encryption->exportPublicKey(),
-                'secretKey' => null,
-            ],
-        ];
-
-        return base64_encode(
-            json_encode($keypair)
-        );
-    }
-
-    public function getAuthentication(): Keypair
-    {
-        return $this->authentication;
-    }
-
-    public function getEncryption(): Keypair
-    {
-        return $this->encryption;
     }
 }

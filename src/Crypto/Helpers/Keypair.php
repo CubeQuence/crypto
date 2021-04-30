@@ -21,7 +21,7 @@ final class Keypair
 
     public function getSecretKey(): SignatureSecretKey | EncryptionSecretKey
     {
-        if (! $this->secretKey) {
+        if (!$this->secretKey) {
             throw new KeyException(
                 message: 'secretKey not set'
             );
@@ -37,19 +37,19 @@ final class Keypair
 
     public function exportSecretKey(): string
     {
-        if (! $this->secretKey) {
+        if (!$this->secretKey) {
             return null;
         }
 
         return KeyFactory::export(
-            key:  $this->secretKey
+            key: $this->secretKey
         )->getString();
     }
 
     public function exportPublicKey(): string
     {
         return KeyFactory::export(
-            key:  $this->publicKey
+            key: $this->publicKey
         )->getString();
     }
 }

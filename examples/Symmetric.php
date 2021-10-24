@@ -2,41 +2,24 @@
 
 declare(strict_types=1);
 
-use CQ\Crypto\Models\SymmetricKey;
+require __DIR__ . '/../vendor/autoload.php';
+
 use CQ\Crypto\Symmetric;
 
 try {
     $string = 'Hello World!';
 
-    // If no encodedKey is provided a new one is generated
-    $key = new SymmetricKey();
-    $exportKey = $key->export();
+    $symmetric = new Symmetric();
+    $symmetric2 = new Symmetric(key: $symmetric->exportKey()); // Optional method of setting the key
 
-    // By providing an exported key you can import it
-    $key2 = new SymmetricKey(encodedKey: $exportKey);
-    $exportKey2 = $key2->export();
+    // Optionally set the key
+    // $symmetric2->setKey(key: $symmetric->exportKey());
 
-    $client = new Symmetric(
-        key: $key
-    );
-    $client2 = new Symmetric(
-        key: $key2
-    );
+    $encrypt = $symmetric->encrypt(plaintext: $string);
+    $decrypt = $symmetric2->decrypt(ciphertext: $encrypt);
 
-    $encryptedString = $client->encrypt(
-        string: $string
-    );
-    $decryptedString = $client2->decrypt(
-        encryptedString: $encryptedString
-    );
-
-    $signature = $client->sign(
-        string: $string
-    );
-    $verify = $client2->verify(
-        string: $string,
-        signature: $signature
-    );
+    $sign = $symmetric->sign(plaintext: $string);
+    $verify = $symmetric2->verify(plaintext: $string, signature: $sign);
 } catch (\Throwable $error) {
     echo $error->getMessage();
     exit;
@@ -44,10 +27,15 @@ try {
 
 echo json_encode([
     'string' => $string,
-    'export' => $exportKey,
-    'export2' => $exportKey2,
-    'encrypted' => $encryptedString,
-    'decrypted' => $decryptedString,
-    'signature' => $signature,
-    'verify' => $verify,
+
+    'key' => [
+        'exportKey' => $symmetric->exportKey(),
+    ],
+
+    'actions' => [
+        'encrypt' => $encrypt,
+        'decrypt' => $decrypt,
+        'sign' => $sign,
+        'verify' => $verify,
+    ],
 ]);

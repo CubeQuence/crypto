@@ -11,51 +11,51 @@ use ParagonIE\HiddenString\HiddenString;
 
 final class Symmetric extends CryptoProvider
 {
-    public function __construct(
-        private SymmetricKey $key
-    ) {
+    private SymmetricKey $key;
+
+    public function __construct(string | null $key = null)
+    {
+        $this->setKey(key: $key);
     }
 
-    /**
-     * Encrypt string
-     */
-    public function encrypt(string $string): string
+    public function setKey(string | null $key = null): void
+    {
+        $this->key = new SymmetricKey(encodedKey: $key);
+    }
+
+    public function exportKey(): string
+    {
+        return $this->key->export();
+    }
+
+    public function encrypt(string $plaintext): string
     {
         return Crypto::encrypt(
-            plaintext: new HiddenString(value: $string),
+            plaintext: new HiddenString(value: $plaintext),
             secretKey: $this->key->getEncryption()
         );
     }
 
-    /**
-     * Decrypt encryptedString
-     */
-    public function decrypt(string $encryptedString): string
+    public function decrypt(string $ciphertext): string
     {
         return Crypto::decrypt(
-            ciphertext: $encryptedString,
+            ciphertext: $ciphertext,
             secretKey: $this->key->getEncryption()
         )->getString();
     }
 
-    /**
-     * Sign string
-     */
-    public function sign(string $string): string
+    public function sign(string $plaintext): string
     {
         return Crypto::authenticate(
-            message: $string,
+            message: $plaintext,
             secretKey: $this->key->getAuthentication()
         );
     }
 
-    /**
-     * Verify string with signature
-     */
-    public function verify(string $string, string $signature): bool
+    public function verify(string $plaintext, string $signature): bool
     {
         return Crypto::verify(
-            message: $string,
+            message: $plaintext,
             secretKey: $this->key->getAuthentication(),
             mac: $signature
         );

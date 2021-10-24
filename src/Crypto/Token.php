@@ -5,45 +5,64 @@ declare(strict_types=1);
 namespace CQ\Crypto;
 
 use CQ\Crypto\Exceptions\TokenException;
+use CQ\Crypto\Models\TokenKey;
 use ParagonIE\Paseto\Exception\PasetoException;
-use ParagonIE\Paseto\Keys\SymmetricKey;
-use ParagonIE\Paseto\Protocol\Version2;
+use ParagonIE\Paseto\Protocol\Version4;
 
 final class Token
 {
-    private static function getKey(string $key): SymmetricKey
+    private TokenKey $key;
+
+    public function __construct(string | null $key = null)
     {
-        $hashedKey = hash(
-            algo: 'sha256',
-            data: $key
-        );
-
-        $shortenedKey = substr($hashedKey, 0, 32);
-
-        return new SymmetricKey(
-            keyMaterial: $shortenedKey
-        );
+        $this->setKey(key: $key);
     }
 
-    public static function create(string $key, array $data): string
+    public function setKey(string | null $key = null): void
     {
-        return Version2::encrypt(
+        $this->key = new TokenKey(encodedKey: $key);
+    }
+
+    public function exportKey(): string
+    {
+        return $this->key->export();
+    }
+
+    public function encrypt(array $data): string
+    {
+        return Version4::encrypt(
             data: json_encode($data),
-            key: self::getKey(key: $key)
+            key: $this->key->getEncryption()
         );
     }
 
-    public static function decode(string $key, string $givenToken): bool | object
+    public function decrypt(string $token): bool | object
     {
         try {
-            $data = Version2::decrypt(
-                data: $givenToken,
-                key: self::getKey(key: $key)
+            $data = Version4::decrypt(
+                data: $token,
+                key: $this->key->getEncryption()
             );
         } catch (PasetoException) {
             throw new TokenException();
         }
 
         return json_decode($data);
+    }
+
+    public function sign(array $data): string
+    {
+        return Version4::sign(
+            data: json_encode($data),
+            key: $this->key->getAuthentication()
+        );
+    }
+
+    public function verify(string $signedToken): string
+    {
+        return Version4::verify(
+            signMsg: $signedToken,
+            key: $this->key->getAuthentication()
+        );
     }
 }

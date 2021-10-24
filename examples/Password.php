@@ -2,25 +2,24 @@
 
 declare(strict_types=1);
 
-use CQ\Crypto\Models\SymmetricKey;
+require __DIR__ . '/../vendor/autoload.php';
+
 use CQ\Crypto\Password;
+use CQ\Crypto\Symmetric;
 
 try {
     $string = 'Hello World!';
-    $context = null;
 
-    $key = new SymmetricKey();
+    // TODO: make cleaner syntax
+
+    $symmetric = new Symmetric();
+    $key = $symmetric->exportKey();
+
+    // Optionally provide key otherwise it will be generated
     $password = new Password(key: $key);
 
-    $encryptedHashedPassword = $password->hash(
-        plaintextPassword: $string,
-        context: $context
-    );
-    $verify = $password->verify(
-        plaintextPassword: $string,
-        encryptedHashedPassword: $encryptedHashedPassword,
-        context: $context
-    );
+    $encryptedHash = $password->hash(plaintext: $string);
+    $verify = $password->verify(plaintext: $string, encryptedHash: $encryptedHash);
 } catch (\Throwable $error) {
     echo $error->getMessage();
     exit;
@@ -28,7 +27,6 @@ try {
 
 echo json_encode([
     'string' => $string,
-    'context' => $context,
-    'encryptedHashedPassword' => $encryptedHashedPassword,
+    'encryptedHash' => $encryptedHash,
     'verify' => $verify,
 ]);

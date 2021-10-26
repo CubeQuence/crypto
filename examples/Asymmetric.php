@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use CQ\Crypto\Asymmetric;
+use CQ\Crypto\Exceptions\CryptoException;
 
 try {
     $string = 'Hello World!';
@@ -32,7 +33,7 @@ try {
 
     $sign = $asymmetric->sign(plaintext: $string); // Using private key
     $verify = $asymmetric2->verify(plaintext: $string, signature: $sign); // Using public key
-} catch (\Throwable $error) {
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }

@@ -23,7 +23,7 @@ final class AsymmetricSubKey
     {
         if (!$this->secretKey) {
             throw new KeyException(
-                message: 'secretKey not set'
+                message: 'secretKey not set, this is a public key only instance'
             );
         }
 
@@ -41,15 +41,23 @@ final class AsymmetricSubKey
             return null;
         }
 
-        return KeyFactory::export(
-            key: $this->secretKey
-        )->getString();
+        try {
+            return KeyFactory::export(
+                key: $this->secretKey
+            )->getString();
+        } catch (\Throwable $th) {
+            throw new KeyException(message: $th->getMessage());
+        }
     }
 
     public function exportPublicKey(): string
     {
-        return KeyFactory::export(
-            key: $this->publicKey
-        )->getString();
+        try {
+            return KeyFactory::export(
+                key: $this->publicKey
+            )->getString();
+        } catch (\Throwable $th) {
+            throw new KeyException(message: $th->getMessage());
+        }
     }
 }

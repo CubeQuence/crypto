@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\Hash;
 
 try {
@@ -11,7 +12,7 @@ try {
 
     $hash = Hash::make(string: $string);
     $verify = Hash::verify(string: $string, hash: $hash);
-} catch (\Throwable $error) {
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }

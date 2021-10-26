@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use CQ\Crypto\Exceptions\TokenException;
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\Token;
 
 try {
@@ -20,11 +20,8 @@ try {
     // $token2->setKey(key: $token->exportKey());
 
     $encrypt = $token->encrypt(data: $data);
-    $decrypt = $token->decrypt(token: $encrypt);
-} catch (TokenException $error) {
-    echo 'Token invalid';
-    exit;
-} catch (\Throwable $error) {
+    $decrypt = $token2->decrypt(token: $encrypt);
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }

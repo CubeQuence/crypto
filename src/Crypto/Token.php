@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
-use CQ\Crypto\Exceptions\TokenException;
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\Models\TokenKey;
-use ParagonIE\Paseto\Exception\PasetoException;
+use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Paseto\Protocol\Version4;
 
-final class Token
+final class Token extends CryptoProvider
 {
     private TokenKey $key;
 
-    public function __construct(string | null $key = null)
-    {
-        $this->setKey(key: $key);
-    }
-
-    public function setKey(string | null $key = null): void
+    public function setKey(string $key): void
     {
         $this->key = new TokenKey(encodedKey: $key);
     }
@@ -30,10 +25,14 @@ final class Token
 
     public function encrypt(array $data): string
     {
-        return Version4::encrypt(
-            data: json_encode($data),
-            key: $this->key->getEncryption()
-        );
+        try {
+            return Version4::encrypt(
+                data: json_encode($data),
+                key: $this->key->getEncryption()
+            );
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
+        }
     }
 
     public function decrypt(string $token): bool | object
@@ -43,8 +42,8 @@ final class Token
                 data: $token,
                 key: $this->key->getEncryption()
             );
-        } catch (PasetoException) {
-            throw new TokenException();
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
         }
 
         return json_decode($data);

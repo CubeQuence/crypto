@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\Password;
 
 try {
@@ -17,7 +18,7 @@ try {
 
     $hash = $password->hash(plaintext: $string);
     $verify = $password2->verify(plaintext: $string, encryptedHash: $hash);
-} catch (\Throwable $error) {
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }

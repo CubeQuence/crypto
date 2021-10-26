@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto;
 
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\Models\AsymmetricKey;
 use CQ\Crypto\Providers\CryptoProvider;
 use ParagonIE\Halite\Asymmetric\Crypto;
@@ -13,7 +14,7 @@ final class Asymmetric extends CryptoProvider
 {
     private AsymmetricKey $key;
 
-    public function setKey(string | null $key = null): void
+    public function setKey(string $key): void
     {
         $this->key = new AsymmetricKey(encodedKey: $key);
     }
@@ -30,34 +31,50 @@ final class Asymmetric extends CryptoProvider
 
     public function encrypt(string $plaintext): string
     {
-        return Crypto::seal(
-            plaintext: new HiddenString(value: $plaintext),
-            publicKey: $this->key->getEncryption()->getPublicKey()
-        );
+        try {
+            return Crypto::seal(
+                plaintext: new HiddenString(value: $plaintext),
+                publicKey: $this->key->getEncryption()->getPublicKey()
+            );
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
+        }
     }
 
     public function decrypt(string $ciphertext): string
     {
-        return Crypto::unseal(
-            ciphertext: $ciphertext,
-            privateKey: $this->key->getEncryption()->getSecretKey()
-        )->getString();
+        try {
+            return Crypto::unseal(
+                ciphertext: $ciphertext,
+                privateKey: $this->key->getEncryption()->getSecretKey()
+            )->getString();
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
+        }
     }
 
     public function sign(string $plaintext): string
     {
-        return Crypto::sign(
-            message: $plaintext,
-            privateKey: $this->key->getAuthentication()->getSecretKey()
-        );
+        try {
+            return Crypto::sign(
+                message: $plaintext,
+                privateKey: $this->key->getAuthentication()->getSecretKey()
+            );
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
+        }
     }
 
     public function verify(string $plaintext, string $signature): bool
     {
-        return Crypto::verify(
-            message: $plaintext,
-            publicKey: $this->key->getAuthentication()->getPublicKey(),
-            signature: $signature
-        );
+        try {
+            return Crypto::verify(
+                message: $plaintext,
+                publicKey: $this->key->getAuthentication()->getPublicKey(),
+                signature: $signature
+            );
+        } catch (\Throwable $th) {
+            throw new CryptoException(message: $th->getMessage());
+        }
     }
 }

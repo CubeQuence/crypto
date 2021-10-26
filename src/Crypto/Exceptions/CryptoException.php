@@ -6,6 +6,6 @@ namespace CQ\Crypto\Exceptions;
 
 use Exception;
 
-final class TokenException extends Exception
+final class CryptoException extends Exception
 {
 }

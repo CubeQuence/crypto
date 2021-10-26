@@ -4,55 +4,51 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\File;
-use CQ\Crypto\Models\AsymmetricKey;
 
 try {
     $orginalFile = 'test.txt';
     $encryptedFile = 'test.txt.enc';
 
-    $asymmetricKey = new AsymmetricKey();
-
-    // Public only key can still be used for encryption and verifying signatures
-    $asymmetricKey2 = new AsymmetricKey(encodedKey: $asymmetricKey->exportPublic());
-
     $file = new File(
-        rootPath: __DIR__
+        rootPath: __DIR__,
+        // key: '', // If no key is provided a new one is generated
+        keyType: 'asymmetric',
     );
 
-    $checksum = $file->checksum(
-        path: $orginalFile
+    $file2 = new File(
+        rootPath: __DIR__,
+        key: $file->exportPublicKey(),
+        keyType: 'asymmetric',
     );
 
-    $file->encrypt(
-        sourcePath: $orginalFile,
-        destinationPath: $encryptedFile,
-        key: $asymmetricKey2
-    );
+    $checksum = $file->checksum(path: $orginalFile);
 
-    $file->decrypt(
-        sourcePath: $encryptedFile,
-        destinationPath: $orginalFile,
-        key: $asymmetricKey
-    );
+    $encrypt = $file2->encrypt(sourcePath: $orginalFile, destinationPath: $encryptedFile);
+    $decrypt = $file->decrypt(sourcePath: $encryptedFile, destinationPath: $orginalFile);
 
-    $signature = $file->sign(
-        path: $orginalFile,
-        key: $asymmetricKey
-    );
-
-    $verify = $file->verify(
-        path: $orginalFile,
-        signature: $signature,
-        key: $asymmetricKey2
-    );
-} catch (\Throwable $error) {
+    $sign = $file->sign(path: $orginalFile);
+    $verify = $file2->verify(path: $orginalFile, signature: $sign);
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }
 
 echo json_encode([
-    'checksum' => $checksum,
-    'signature' => $signature,
-    'verify' => $verify,
+    'orginalFile' => $orginalFile,
+    'encryptedFile' => $encryptedFile,
+
+    'key' => [
+        'exportKey' => $file->exportKey(),
+        'exportPublicKey' => $file->exportPublicKey(),
+    ],
+
+    'actions' => [
+        'checksum' => $checksum,
+        'encrypt' => $encrypt,
+        'decrypt' => $decrypt,
+        'sign' => $sign,
+        'verify' => $verify
+    ],
 ]);

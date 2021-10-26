@@ -5,35 +5,32 @@ declare(strict_types=1);
 namespace CQ\Crypto\Models;
 
 use CQ\Crypto\Random;
-use CQ\Crypto\Exceptions\TokenException;
+use CQ\Crypto\Exceptions\KeyException;
+use CQ\Crypto\Providers\KeyProvider;
 use ParagonIE\Paseto\Keys\Version4\SymmetricKey;
 
-final class TokenKey
+final class TokenKey extends KeyProvider
 {
     private string $keystring;
 
-    public function __construct(string | null $encodedKey = null)
+    protected function generate(): void
     {
-        if (!$encodedKey) {
-            return $this->genKey();
-        }
-
-        $this->import(
-            encodedKey: $encodedKey
-        );
+        $this->keystring = Random::string(64);
     }
 
-    /**
-     * Export key
-     */
+    protected function import(string $encodedKey): void
+    {
+        $this->keystring = base64_decode($encodedKey);
+    }
+
     public function export(): string
     {
         return base64_encode($this->keystring);
     }
 
-    public function getAuthentication(): void
+    public function getAuthentication(): SymmetricKey
     {
-        throw new TokenException('Authentication is not supported for TokenKey');
+        throw new KeyException('Authentication is not supported for TokenKey');
     }
 
     public function getEncryption(): SymmetricKey
@@ -41,21 +38,5 @@ final class TokenKey
         return new SymmetricKey(
             keyMaterial: $this->keystring
         );
-    }
-
-    /**
-     * Generate key
-     */
-    protected function genKey(): void
-    {
-        $this->keystring = Random::string(64);
-    }
-
-    /**
-     * Import key
-     */
-    protected function import(string $encodedKey): void
-    {
-        $this->keystring = base64_decode($encodedKey);
     }
 }

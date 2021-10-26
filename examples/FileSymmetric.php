@@ -4,42 +4,47 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use CQ\Crypto\Exceptions\CryptoException;
 use CQ\Crypto\File;
-use CQ\Crypto\Models\SymmetricKey;
 
 try {
     $orginalFile = 'test.txt';
     $encryptedFile = 'test.txt.enc';
 
-    $symmetricKey = new SymmetricKey();
-    $symmetricKey2 = new SymmetricKey(encodedKey: $symmetricKey->export());
-
     $file = new File(
-        rootPath: __DIR__
+        rootPath: __DIR__,
+        // key: '', // If no key is provided a new one is generated
+        keyType: 'symmetric',
     );
 
-    $checksum = $file->checksum(
-        path: $orginalFile
+    $file2 = new File(
+        rootPath: __DIR__,
+        key: $file->exportKey(),
+        keyType: 'symmetric',
     );
 
-    $file->encrypt(
-        sourcePath: $orginalFile,
-        destinationPath: $encryptedFile,
-        key: $symmetricKey
-    );
+    $checksum = $file->checksum(path: $orginalFile);
 
-    $file->decrypt(
-        sourcePath: $encryptedFile,
-        destinationPath: $orginalFile,
-        key: $symmetricKey2
-    );
+    $encrypt = $file->encrypt(sourcePath: $orginalFile, destinationPath: $encryptedFile);
+    $decrypt = $file2->decrypt(sourcePath: $encryptedFile, destinationPath: $orginalFile);
 
     // Symmetric file crypto doesn't support signing and verifying
-} catch (\Throwable $error) {
+} catch (CryptoException $error) {
     echo $error->getMessage();
     exit;
 }
 
 echo json_encode([
-    'checksum' => $checksum,
+    'orginalFile' => $orginalFile,
+    'encryptedFile' => $encryptedFile,
+
+    'key' => [
+        'exportKey' => $file->exportKey(),
+    ],
+
+    'actions' => [
+        'checksum' => $checksum,
+        'encrypt' => $encrypt,
+        'decrypt' => $decrypt,
+    ],
 ]);

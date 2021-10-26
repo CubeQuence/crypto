@@ -6,6 +6,21 @@ namespace CQ\Crypto\Providers;
 
 abstract class CryptoProvider
 {
+    public function __construct(string | null $key = null)
+    {
+        $this->setKey(key: $key);
+    }
+
+    /**
+     * Import base64 key
+     */
+    abstract public function setKey(string | null $key = null): void;
+
+    /**
+     * Export key in base64 format
+     */
+    abstract public function exportKey(): string;
+
     /**
      * Encrypt string
      */

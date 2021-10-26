@@ -13,11 +13,6 @@ final class Symmetric extends CryptoProvider
 {
     private SymmetricKey $key;
 
-    public function __construct(string | null $key = null)
-    {
-        $this->setKey(key: $key);
-    }
-
     public function setKey(string | null $key = null): void
     {
         $this->key = new SymmetricKey(encodedKey: $key);

@@ -13,11 +13,6 @@ final class Asymmetric extends CryptoProvider
 {
     private AsymmetricKey $key;
 
-    public function __construct(string | null $key = null)
-    {
-        $this->setKey(key: $key);
-    }
-
     public function setKey(string | null $key = null): void
     {
         $this->key = new AsymmetricKey(encodedKey: $key);

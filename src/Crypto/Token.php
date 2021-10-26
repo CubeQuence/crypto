@@ -49,20 +49,4 @@ final class Token
 
         return json_decode($data);
     }
-
-    public function sign(array $data): string
-    {
-        return Version4::sign(
-            data: json_encode($data),
-            key: $this->key->getAuthentication()
-        );
-    }
-
-    public function verify(string $signedToken): string
-    {
-        return Version4::verify(
-            signMsg: $signedToken,
-            key: $this->key->getAuthentication()
-        );
-    }
 }

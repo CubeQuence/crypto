@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Models;
 
-use CQ\Crypto\Providers\KeyProvider;
 use CQ\Crypto\Random;
-use ParagonIE\Paseto\Keys\SymmetricKey;
-use ParagonIE\Paseto\Keys\Version4\AsymmetricSecretKey;
-use ParagonIE\Paseto\Keys\Version4\SymmetricKey as Version4SymmetricKey;
+use CQ\Crypto\Exceptions\TokenException;
+use ParagonIE\Paseto\Keys\Version4\SymmetricKey;
 
-final class TokenKey extends KeyProvider
+final class TokenKey
 {
     private string $keystring;
+
+    public function __construct(string | null $encodedKey = null)
+    {
+        if (!$encodedKey) {
+            return $this->genKey();
+        }
+
+        $this->import(
+            encodedKey: $encodedKey
+        );
+    }
 
     /**
      * Export key
@@ -22,17 +31,16 @@ final class TokenKey extends KeyProvider
         return base64_encode($this->keystring);
     }
 
-    public function getAuthentication(): AsymmetricSecretKey
+    public function getAuthentication(): void
     {
-        // AsymmetricSecretKey
-        return KeyFactory::importAuthenticationKey(
-            keyData: new HiddenString(value: $this->keystring)
-        );
+        throw new TokenException('Authentication is not supported for TokenKey');
     }
 
-    public function getEncryption(): Version4SymmetricKey
+    public function getEncryption(): SymmetricKey
     {
-        // Version4SymmetricKey
+        return new SymmetricKey(
+            keyMaterial: $this->keystring
+        );
     }
 
     /**
@@ -40,10 +48,7 @@ final class TokenKey extends KeyProvider
      */
     protected function genKey(): void
     {
-        $randomString = Random::string(32); // TODO: maybe set longer length
-        $hashedString = sha1($randomString);
-
-        $this->keystring = substr($hashedString, 0, 32);
+        $this->keystring = Random::string(64);
     }
 
     /**

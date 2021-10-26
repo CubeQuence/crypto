@@ -15,6 +15,16 @@ final class Password
         );
     }
 
+    public function setKey(string | null $key = null): void
+    {
+        $this->symmetric->setKey(key: $key);
+    }
+
+    public function exportKey(): string
+    {
+        return $this->symmetric->exportKey();
+    }
+
     /**
      * Hash and encrypt string
      */

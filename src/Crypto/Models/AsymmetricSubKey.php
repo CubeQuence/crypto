@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CQ\Crypto\Helpers;
+namespace CQ\Crypto\Models;
 
 use CQ\Crypto\Exceptions\KeyException;
 use ParagonIE\Halite\Asymmetric\EncryptionPublicKey;
@@ -11,7 +11,7 @@ use ParagonIE\Halite\Asymmetric\SignaturePublicKey;
 use ParagonIE\Halite\Asymmetric\SignatureSecretKey;
 use ParagonIE\Halite\KeyFactory;
 
-final class Keypair
+final class AsymmetricSubKey
 {
     public function __construct(
         private SignaturePublicKey | EncryptionPublicKey $publicKey,

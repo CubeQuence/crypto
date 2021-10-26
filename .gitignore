@@ -3,3 +3,5 @@
 /.vscode
 
 *.phpunit.result.cache
+
+examples/test.txt.enc

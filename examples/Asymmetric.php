@@ -10,6 +10,8 @@ try {
     $string = 'Hello World!';
 
     $asymmetric = new Asymmetric(); // If no key is provided a new one is generated
+
+    // Public only key can still be used for encryption and verifying signatures
     $asymmetric2 = new Asymmetric(key: $asymmetric->exportPublicKey()); // Instance with only public key
 
     /**

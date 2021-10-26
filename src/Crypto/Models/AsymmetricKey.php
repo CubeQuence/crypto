@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Models;
 
-use CQ\Crypto\Helpers\Keypair;
 use CQ\Crypto\Providers\KeyProvider;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\HiddenString\HiddenString;
 
 final class AsymmetricKey extends KeyProvider
 {
-    private Keypair $authentication;
-    private Keypair $encryption;
+    private AsymmetricSubKey $authentication;
+    private AsymmetricSubKey $encryption;
 
     /**
      * Export private key
@@ -56,12 +55,12 @@ final class AsymmetricKey extends KeyProvider
         );
     }
 
-    public function getAuthentication(): Keypair
+    public function getAuthentication(): AsymmetricSubKey
     {
         return $this->authentication;
     }
 
-    public function getEncryption(): Keypair
+    public function getEncryption(): AsymmetricSubKey
     {
         return $this->encryption;
     }
@@ -74,12 +73,12 @@ final class AsymmetricKey extends KeyProvider
         $authenticationKeypair = KeyFactory::generateSignatureKeyPair();
         $encryptionKeypair = KeyFactory::generateEncryptionKeypair();
 
-        $this->authentication = new Keypair(
+        $this->authentication = new AsymmetricSubKey(
             publicKey: $authenticationKeypair->getPublicKey(),
             secretKey: $authenticationKeypair->getSecretKey()
         );
 
-        $this->encryption = new Keypair(
+        $this->encryption = new AsymmetricSubKey(
             publicKey: $encryptionKeypair->getPublicKey(),
             secretKey: $encryptionKeypair->getSecretKey()
         );
@@ -94,7 +93,7 @@ final class AsymmetricKey extends KeyProvider
             base64_decode($encodedKey)
         );
 
-        $this->authentication = new Keypair(
+        $this->authentication = new AsymmetricSubKey(
             publicKey: KeyFactory::importSignaturePublicKey(
                 keyData: new HiddenString(
                     value: $decodedKey->authentication->publicKey
@@ -108,7 +107,7 @@ final class AsymmetricKey extends KeyProvider
                 ) : null // If secretKey isset import it otherwise set null
         );
 
-        $this->encryption = new Keypair(
+        $this->encryption = new AsymmetricSubKey(
             publicKey: KeyFactory::importEncryptionPublicKey(
                 keyData: new HiddenString(
                     value: $decodedKey->encryption->publicKey

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CQ\Crypto\Providers;
 
-use CQ\Crypto\Helpers\Keypair;
+use CQ\Crypto\Models\AsymmetricSubKey;
 use ParagonIE\Halite\Symmetric\AuthenticationKey;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 
@@ -26,9 +26,9 @@ abstract class KeyProvider
      */
     abstract public function export(): string;
 
-    abstract public function getAuthentication(): AuthenticationKey | Keypair;
+    abstract public function getAuthentication(): AuthenticationKey | AsymmetricSubKey;
 
-    abstract public function getEncryption(): EncryptionKey | Keypair;
+    abstract public function getEncryption(): EncryptionKey | AsymmetricSubKey;
 
     /**
      * Generate key

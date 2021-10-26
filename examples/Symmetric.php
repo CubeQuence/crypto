@@ -9,7 +9,7 @@ use CQ\Crypto\Symmetric;
 try {
     $string = 'Hello World!';
 
-    $symmetric = new Symmetric();
+    $symmetric = new Symmetric(); // If no key is provided a new one is generated
     $symmetric2 = new Symmetric(key: $symmetric->exportKey()); // Optional method of setting the key
 
     // Different optional way of setting the key

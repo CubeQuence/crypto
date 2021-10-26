@@ -13,10 +13,7 @@ final class File
     public function __construct(
         private string $rootPath
     ) {
-        if (! str_ends_with(
-            haystack: $this->rootPath,
-            needle: '/'
-        )) {
+        if (!str_ends_with(haystack: $this->rootPath, needle: '/')) {
             $this->rootPath .= '/';
         }
     }

@@ -7,9 +7,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use CQ\Crypto\Exceptions\TokenException;
 use CQ\Crypto\Token;
 
-
-
-
 try {
     $data = [
         'foo' => 'bar',
@@ -19,11 +16,11 @@ try {
     $token = new Token();
     $token2 = new Token(key: $token->exportKey()); // Optional method of setting the key
 
+    // Different optional way of setting the key
+    // $token2->setKey(key: $token->exportKey());
+
     $encrypt = $token->encrypt(data: $data);
     $decrypt = $token->decrypt(token: $encrypt);
-
-    // TODO: sign
-    // TODO: verify
 } catch (TokenException $error) {
     echo 'Token invalid';
     exit;
@@ -42,7 +39,5 @@ echo json_encode([
     'actions' => [
         'encrypt' => $encrypt,
         'decrypt' => $decrypt,
-        // 'sign' => $sign,
-        // 'verify' => $verify,
     ]
 ]);

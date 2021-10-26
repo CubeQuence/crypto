@@ -12,7 +12,7 @@ try {
     $symmetric = new Symmetric();
     $symmetric2 = new Symmetric(key: $symmetric->exportKey()); // Optional method of setting the key
 
-    // Optionally set the key
+    // Different optional way of setting the key
     // $symmetric2->setKey(key: $symmetric->exportKey());
 
     $encrypt = $symmetric->encrypt(plaintext: $string);

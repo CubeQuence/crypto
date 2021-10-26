@@ -5,21 +5,18 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use CQ\Crypto\Password;
-use CQ\Crypto\Symmetric;
 
 try {
     $string = 'Hello World!';
 
-    // TODO: make cleaner syntax
+    $password = new Password();
+    $password2 = new Password(key: $password->exportKey()); // Optionally provide key otherwise it will be generated
 
-    $symmetric = new Symmetric();
-    $key = $symmetric->exportKey();
+    // Different optional way of setting the key
+    // $password2->setKey(key: $password->exportKey());
 
-    // Optionally provide key otherwise it will be generated
-    $password = new Password(key: $key);
-
-    $encryptedHash = $password->hash(plaintext: $string);
-    $verify = $password->verify(plaintext: $string, encryptedHash: $encryptedHash);
+    $hash = $password->hash(plaintext: $string);
+    $verify = $password2->verify(plaintext: $string, encryptedHash: $hash);
 } catch (\Throwable $error) {
     echo $error->getMessage();
     exit;
@@ -27,6 +24,13 @@ try {
 
 echo json_encode([
     'string' => $string,
-    'encryptedHash' => $encryptedHash,
-    'verify' => $verify,
+
+    'key' => [
+        'exportKey' => $password->exportKey(),
+    ],
+
+    'actions' => [
+        'hash' => $hash,
+        'verify' => $verify,
+    ],
 ]);

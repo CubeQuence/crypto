@@ -470,16 +470,16 @@
         },
         {
             "name": "paragonie/paseto",
-            "version": "v2.1.1",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/paseto.git",
-                "reference": "e16113beeaddeee8548a67afb75d288570518a46"
+                "reference": "46d19c106305c7cf30af029e48786bf269f2e754"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/paseto/zipball/e16113beeaddeee8548a67afb75d288570518a46",
-                "reference": "e16113beeaddeee8548a67afb75d288570518a46",
+                "url": "https://api.github.com/repos/paragonie/paseto/zipball/46d19c106305c7cf30af029e48786bf269f2e754",
+                "reference": "46d19c106305c7cf30af029e48786bf269f2e754",
                 "shasum": ""
             },
             "require": {
@@ -515,9 +515,9 @@
             "description": "Platform-Agnostic Security Tokens",
             "support": {
                 "issues": "https://github.com/paragonie/paseto/issues",
-                "source": "https://github.com/paragonie/paseto/tree/v2.1.1"
+                "source": "https://github.com/paragonie/paseto/tree/v2.2.0"
             },
-            "time": "2021-09-17T17:07:36+00:00"
+            "time": "2021-10-27T05:47:07+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -657,16 +657,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.33",
+            "version": "2.0.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "fb53b7889497ec7c1362c94e61d8127ac67ea094"
+                "reference": "98a6fe587f3481aea319eef7e656d02cfe1675ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/fb53b7889497ec7c1362c94e61d8127ac67ea094",
-                "reference": "fb53b7889497ec7c1362c94e61d8127ac67ea094",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/98a6fe587f3481aea319eef7e656d02cfe1675ec",
+                "reference": "98a6fe587f3481aea319eef7e656d02cfe1675ec",
                 "shasum": ""
             },
             "require": {
@@ -746,7 +746,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.33"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.34"
             },
             "funding": [
                 {
@@ -762,7 +762,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-16T04:20:12+00:00"
+            "time": "2021-10-27T02:46:30+00:00"
         }
     ],
     "packages-dev": [

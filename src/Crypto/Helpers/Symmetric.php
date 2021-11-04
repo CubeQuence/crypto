@@ -8,7 +8,7 @@ use CQ\Crypto\Symmetric as SymmetricProvider;
 
 final class Symmetric
 {
-    private static function getProvider(string | null $key = null): SymmetricProvider
+    private static function getProvider(string $key = ''): SymmetricProvider
     {
         return new SymmetricProvider(key: $key);
     }
